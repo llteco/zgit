@@ -16,7 +16,7 @@ from .plot import plot
 
 
 def main():
-    parser = argparse.ArgumentParser(prog="python -m zgit")
+    parser = argparse.ArgumentParser(prog="python -m easygit")
     parser.add_argument(
         "--git-repo", type=Path, help="specify a git repo directory to analysis"
     )
@@ -24,7 +24,7 @@ def main():
         "--git-log",
         type=Path,
         help="specify a git log file to analysis, "
-        "log file can be accquired by 'git log --numstat > log.txt'. "
+        "log file can be acquired by 'git log --numstat > log.txt'. "
         "This option is ignored if --git-repo is specified.",
     )
     parser.add_argument("-o", "--output", type=Path, help="specify an output directory")
@@ -36,10 +36,10 @@ def main():
     )
     parser.add_argument(
         "--group",
-        choices=("day", "ww", "month", "quater"),
+        choices=("day", "ww", "month", "quarter"),
         default="month",
         help="merge commits on which time slice, "
-        "supports day, work-week, month, and quater",
+        "supports day, work-week, month, and quarter",
     )
     parser.add_argument(
         "--log-scale", action="store_true", help="plot the figure on log-scale y-axis."

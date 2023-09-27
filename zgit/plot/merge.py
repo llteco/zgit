@@ -32,8 +32,8 @@ def merge_date(commit_data: dict, by):
             date_data = by_time(data, by_ww)
         elif by == "month":
             date_data = by_time(data, by_month)
-        elif by == "quater":
-            date_data = by_time(data, by_quater)
+        elif by == "quarter":
+            date_data = by_time(data, by_quarter)
         date_commits[author] = date_data
     return date_commits
 
@@ -63,7 +63,7 @@ def by_month(date: datetime.datetime):
     return date.month
 
 
-def by_quater(date: datetime.datetime):
+def by_quarter(date: datetime.datetime):
     return date.month // 4
 
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("json")
     parser.add_argument("--use_name", action="store_true")
-    parser.add_argument("--by_time", choices=("day", "ww", "month", "quater"))
+    parser.add_argument("--by_time", choices=("day", "ww", "month", "quarter"))
     parser.add_argument("-o", "--output")
     args = parser.parse_args()
 
