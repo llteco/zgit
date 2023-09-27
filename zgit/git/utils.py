@@ -7,13 +7,14 @@ Copyright Wenyi Tang 2023
 Git command utility
 """
 
+import locale
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional
 
 import dateparser
 
-from . import git, pushd
+from . import git, pushd, raw_git
 
 logger = logging.getLogger("ZGIT")
 
@@ -21,7 +22,16 @@ logger = logging.getLogger("ZGIT")
 def is_git_repo(repo: Path) -> bool:
     """Check whether a directory is a git repo."""
     with pushd(repo, redir=True):
-        return git("status") == 0
+        ret = raw_git("status")
+        if ret.returncode == 0:
+            return True
+        error: str = ret.stderr.decode(locale.getpreferredencoding())
+        if "fatal: detected dubious ownership in repository" in error:
+            # add repo into safe directory
+            logger.info(f"adding {repo} to safe directory")
+            return git("config --global --add safe.directory", repo.as_posix()) == 0
+        else:
+            return False
 
 
 def stash_workspace(repo: Path):

@@ -36,6 +36,7 @@ def update(repo: Path, upstream: Optional[str] = None):
     """
     if not is_git_repo(repo):
         logger.info("ignore %s because it is not a git repo.", repo)
+        return
     logger.info("updating repo: %s", repo)
 
     remote_tags = get_remote_tag(repo)

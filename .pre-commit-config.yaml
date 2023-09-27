@@ -1,1 +1,30 @@
-C:/users/twytw/works/icg-repos/applications.ai.compiler.vpu-low-level/.pre-commit-config.yaml
+fail_fast: false
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    - id: trailing-whitespace
+    - id: end-of-file-fixer
+    - id: check-merge-conflict
+    - id: check-json
+      exclude: ".vscode/"
+    - id: check-added-large-files
+      args: ["--maxkb=1024"]
+    - id: requirements-txt-fixer
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.5
+    hooks:
+    - id: codespell
+      args: [-I=.github/words_bag.txt, -w]
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+    - id: isort
+      args:
+      - '--profile=black'
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+    - id: black
+      args:
+      - '-vv'

@@ -32,9 +32,26 @@ def parse_args():
     """Parse command arguments"""
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("root", type=Path)
-    parser.add_argument("--max-search-depth", "-d", type=int, default=-1)
-    parser.add_argument("--archive", type=int, default=-1)
+    parser.add_argument(
+        "root",
+        type=Path,
+        help="the top folder you want to search git repos and update",
+    )
+    parser.add_argument(
+        "--max-search-depth",
+        "-d",
+        type=int,
+        default=-1,
+        help="maximum search depth in the `root` folder, -1 means unlimited.",
+    )
+    parser.add_argument(
+        "--archive",
+        type=int,
+        default=-1,
+        help="""archive .git in a repo to save disk space, a repo hasn't been updated
+for more than `archive` days will be compressed into a tarball.""",
+    )
+    parser.add_argument("--jobs", "-j", type=int, default=0)
     return parser.parse_args()
 
 
@@ -47,6 +64,11 @@ def sync():
         func = Compose(update, partial(archive, older_than=args.archive))
     else:
         func = Compose(update)
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        executor.map(func, gen)
-    executor.shutdown()
+    if args.jobs == 1:
+        for i in gen:
+            func(i)
+    else:
+        workers = args.jobs if args.jobs > 0 else None
+        with concurrent.futures.ProcessPoolExecutor(workers) as executor:
+            executor.map(func, gen)
+        executor.shutdown()

@@ -31,11 +31,11 @@ if _GIT is None:
 logger = logging.getLogger("ZGIT")
 
 
-def git(*args, **kwargs) -> int:
+def raw_git(*args: str, **kwargs) -> sp.CompletedProcess:
     """Execute git command with arguments.
 
     Returns:
-        int: git command return code.
+        CompletedProcess: git command return struct.
     """
     _git = Path(_GIT).resolve()
     args = [i.split(" ") for i in args]
@@ -49,7 +49,16 @@ def git(*args, **kwargs) -> int:
         else:
             args.append(f"--{k}={v}")
     logger.debug("git %s", " ".join(args))
-    ret = sp.run(args, executable=str(_git), check=False, capture_output=True)
+    return sp.run(args, executable=str(_git), check=False, capture_output=True)
+
+
+def git(*args: str, **kwargs) -> int:
+    """Execute git command with arguments.
+
+    Returns:
+        int: git command return code.
+    """
+    ret = raw_git(*args, **kwargs)
     if ret.stdout:
         print(ret.stdout.decode(locale.getpreferredencoding()), file=sys.stdout)
     if ret.stderr:
