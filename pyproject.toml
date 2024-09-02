@@ -22,6 +22,7 @@ Home = "https://github.com/llteco/zgit"
 [project.scripts]
 zgit-sync = "zgit.sync.sync:sync"
 zgit-plot = "zgit.plot.__main__:main"
+zgit-gc = "zgit.gc.__main__:main"
 
 [tool.flake8]
 ignore = ['E231', 'E241']
