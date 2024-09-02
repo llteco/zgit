@@ -1,5 +1,5 @@
 """
-Copyright Wenyi Tang 2023
+Copyright Wenyi Tang 2024
 
 :Author: Wenyi Tang
 :Email: wenyitang@outlook.com
@@ -31,7 +31,7 @@ if _GIT is None:
 logger = logging.getLogger("ZGIT")
 
 
-def raw_git(*args: str, **kwargs) -> sp.CompletedProcess:
+def raw_git(*args: str, no_capture=False, **kwargs) -> sp.CompletedProcess:
     """Execute git command with arguments.
 
     Returns:
@@ -42,14 +42,19 @@ def raw_git(*args: str, **kwargs) -> sp.CompletedProcess:
     args = [""] + list(chain(*args))
     for k, v in kwargs.items():
         assert isinstance(k, str)
-        if k.startswith("-"):
+        k = k.replace("_", "-")
+        if isinstance(v, bool) and v:
+            args.append(f"--{k}")
+        elif k.startswith("-"):
             args.append(f"{k}={v}")
         elif len(k) == 1:
             args.append(f"-{k}={v}")
-        else:
+        elif not isinstance(v, bool):
             args.append(f"--{k}={v}")
     logger.debug("git %s", " ".join(args))
-    return sp.run(args, executable=str(_git), check=False, capture_output=True)
+    return sp.run(
+        args, executable=str(_git), check=False, capture_output=not no_capture
+    )
 
 
 def git(*args: str, **kwargs) -> int:

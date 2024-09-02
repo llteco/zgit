@@ -1,6 +1,6 @@
 """A collection of git sync and analysis tools.
 
-Copyright Wenyi Tang 2023
+Copyright Wenyi Tang 2024
 
 :Author: Wenyi Tang
 :Email: wenyitang@outlook.com
@@ -15,4 +15,4 @@ handler.setLevel(logging.INFO)
 handler.setFormatter(logging.Formatter("[%(asctime)s][%(levelname)s] %(message)s"))
 logger.addHandler(handler)
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"

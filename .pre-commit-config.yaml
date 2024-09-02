@@ -1,7 +1,7 @@
 fail_fast: false
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
     - id: trailing-whitespace
     - id: end-of-file-fixer
@@ -12,18 +12,18 @@ repos:
       args: ["--maxkb=1024"]
     - id: requirements-txt-fixer
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.5
+    rev: v2.3.0
     hooks:
     - id: codespell
       args: [-I=.github/words_bag.txt, -w]
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 5.13.2
     hooks:
     - id: isort
       args:
       - '--profile=black'
   - repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 24.8.0
     hooks:
     - id: black
       args:
