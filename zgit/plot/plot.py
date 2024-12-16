@@ -1,9 +1,18 @@
-#! /usr/bin/python
+"""
+Copyright Wenyi Tang 2024
+
+:Author: Wenyi Tang
+:Email: wenyitang@outlook.com
+
+"""
 
 from pathlib import Path
+from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+from zgit.plot.commit import CommitMessage
 
 _FILES = {
     ".c",
@@ -24,13 +33,7 @@ _FILES = {
     "BUILD",
 }
 
-_EXCLUDE = {
-    "external/wdk",
-    "external/vpl",
-    "external/ffx-fsr",
-    "thirdparty/directx",
-    "json.hpp",
-}
+_EXCLUDE = set()
 
 
 def reduce(stats: list, includes=_FILES, excludes=_EXCLUDE, threshold=100000):
@@ -52,7 +55,17 @@ def reduce(stats: list, includes=_FILES, excludes=_EXCLUDE, threshold=100000):
     return total_add, total_del
 
 
-def plot_single(author, year, data, log_scale, includes, excludes, threshold, output):
+def plot_single(
+    author: str,
+    year: int,
+    data: Dict[int, List[CommitMessage]],
+    log_scale: bool,
+    includes: List[str],
+    excludes: List[str],
+    threshold: int,
+    output: str | Path,
+    group_by: str,
+):
     filename = Path(output) / f"{author.split('@')[0]}-{year}.png"
     filename.parent.mkdir(exist_ok=True, parents=True)
     stats = []
@@ -83,9 +96,25 @@ def plot_single(author, year, data, log_scale, includes, excludes, threshold, ou
     plt.close()
 
 
-def plot(commits, output, log_scale, includes, excludes, threshold):
+def plot(
+    commits: Dict[str, Dict[int, Dict[int, List[CommitMessage]]]],
+    output: str | Path,
+    log_scale: bool,
+    includes: List[str],
+    excludes: List[str],
+    threshold: int,
+    group_by: str,
+):
     for author, timed_data in commits.items():
         for year, data in timed_data.items():
             plot_single(
-                author, year, data, log_scale, includes, excludes, threshold, output
+                author,
+                year,
+                data,
+                log_scale,
+                includes,
+                excludes,
+                threshold,
+                output,
+                group_by,
             )

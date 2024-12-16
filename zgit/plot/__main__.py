@@ -5,6 +5,7 @@ Copyright Wenyi Tang 2023
 :Email: wenyitang@outlook.com
 
 """
+
 import argparse
 import json
 import logging
@@ -37,7 +38,7 @@ def main():
     parser.add_argument(
         "--group",
         choices=("day", "ww", "month", "quarter"),
-        default="month",
+        default=None,
         help="merge commits on which time slice, "
         "supports day, work-week, month, and quarter",
     )
@@ -91,6 +92,7 @@ def main():
             args.include,
             args.exclude,
             args.threshold,
+            args.group,
         )
 
 
