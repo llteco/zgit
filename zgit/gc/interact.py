@@ -1,20 +1,22 @@
 """
-Copyright Wenyi Tang 2024
+Copyright Wenyi Tang 2024-2025
 
 :Author: Wenyi Tang
 :Email: wenyitang@outlook.com
 
 """
 
-from typing import List, Type
+from typing import Optional, Set, Type, TypeVar
+
+T = TypeVar("T")
 
 
 def want_input(
     prompt: str,
-    dtype: Type[object] = str,
-    choices: List = None,
-    defaults=None,
-):
+    dtype: Type[T] = str,
+    choices: Optional[Set[str]] = None,
+    defaults: Optional[T] = None,
+) -> Optional[T]:
     """Handle a user input value from console."""
 
     if choices and defaults is not None:

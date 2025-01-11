@@ -1,5 +1,5 @@
 """
-Copyright Wenyi Tang 2024
+Copyright Wenyi Tang 2024-2025
 
 :Author: Wenyi Tang
 :Email: wenyitang@outlook.com
@@ -9,14 +9,24 @@ Git command utility
 
 import locale
 import logging
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List, Optional, TypedDict
 
 import dateparser
 
 from . import git, pushd, raw_git
 
 logger = logging.getLogger("ZGIT")
+
+
+class FullCommitInfo(TypedDict):
+    """Typed dict for full commit information."""
+
+    commit: str
+    author: str
+    date: Optional[datetime]
+    log: str
 
 
 def is_git_repo(repo: Path) -> bool:
@@ -69,7 +79,7 @@ def get_current_branch(repo: Path) -> Optional[str]:
         return contents[0]
 
 
-def get_commit_full_log(repo: Path, commit: str = "HEAD") -> Dict[str, str]:
+def get_commit_full_log(repo: Path, commit: str = "HEAD") -> FullCommitInfo:
     """Get all log message at the HEAD commit."""
     with pushd(repo, redir=True) as content:
         ret = git(f"log {commit}^..{commit}", date="local")
@@ -79,12 +89,12 @@ def get_commit_full_log(repo: Path, commit: str = "HEAD") -> Dict[str, str]:
             git(f"log {commit}", date="local")
     lines = content.getvalue().splitlines()
     raw_date = lines[2].split(maxsplit=1)[1].strip()
-    return {
-        "commit": lines[0].split(maxsplit=2)[1],
-        "author": lines[1].split(maxsplit=1)[1].strip(),
-        "date": dateparser.parse(raw_date),
-        "log": "\n".join(lines[3:]),
-    }
+    return FullCommitInfo(
+        commit=lines[0].split(maxsplit=2)[1],
+        author=lines[1].split(maxsplit=1)[1].strip(),
+        date=dateparser.parse(raw_date),
+        log="\n".join(lines[3:]),
+    )
 
 
 def get_commit_id(repo: Path) -> str:

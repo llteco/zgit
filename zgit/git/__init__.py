@@ -1,5 +1,5 @@
 """
-Copyright Wenyi Tang 2024
+Copyright Wenyi Tang 2024-2025
 
 :Author: Wenyi Tang
 :Email: wenyitang@outlook.com
@@ -20,10 +20,11 @@ from pathlib import Path
 
 _GIT = shutil.which("git")
 if _GIT is None:
-    with contextlib.suppress(StopIteration, ImportError):
-        import find_git
+    from zgit.git import find_git
 
-        _GIT = find_git.GIT
+    _GIT = find_git.GIT
+else:
+    _GIT = Path(_GIT).resolve()
 
 if _GIT is None:
     raise FileNotFoundError("git is not found!")
@@ -37,23 +38,25 @@ def raw_git(*args: str, no_capture=False, **kwargs) -> sp.CompletedProcess:
     Returns:
         CompletedProcess: git command return struct.
     """
+    assert _GIT is not None
+
     _git = Path(_GIT).resolve()
-    args = [i.split(" ") for i in args]
-    args = [""] + list(chain(*args))
+    arglist = [i.split(" ") for i in args]
+    arglist = [""] + list(chain(*arglist))
     for k, v in kwargs.items():
         assert isinstance(k, str)
         k = k.replace("_", "-")
         if isinstance(v, bool) and v:
-            args.append(f"--{k}")
+            arglist.append(f"--{k}")
         elif k.startswith("-"):
-            args.append(f"{k}={v}")
+            arglist.append(f"{k}={v}")
         elif len(k) == 1:
-            args.append(f"-{k}={v}")
+            arglist.append(f"-{k}={v}")
         elif not isinstance(v, bool):
-            args.append(f"--{k}={v}")
-    logger.debug("git %s", " ".join(args))
+            arglist.append(f"--{k}={v}")
+    logger.debug("git %s", " ".join(arglist))
     return sp.run(
-        args, executable=str(_git), check=False, capture_output=not no_capture
+        arglist, executable=str(_git), check=False, capture_output=not no_capture
     )
 
 
@@ -72,6 +75,12 @@ def git(*args: str, **kwargs) -> int:
 
 
 @contextlib.contextmanager
+def empty_context():
+    """An empty context."""
+    yield None
+
+
+@contextlib.contextmanager
 def pushd(dir: os.PathLike, redir: bool = False):  # pylint: disable=W0622
     """A context to temporarily enter a new working directory.
 
@@ -80,6 +89,7 @@ def pushd(dir: os.PathLike, redir: bool = False):  # pylint: disable=W0622
         redir (bool): redirect stdout to a string io
     """
     cwd = os.getcwd()
+    stdout, stderr = empty_context(), empty_context()
     try:
         logger.debug("change cwd to: %s", dir)
         os.chdir(dir)

@@ -1,5 +1,5 @@
 """
-Copyright Wenyi Tang 2024
+Copyright Wenyi Tang 2024-2025
 
 :Author: Wenyi Tang
 :Email: wenyitang@outlook.com
@@ -42,6 +42,13 @@ def parse_args():
         "--depth",
         "-d",
         type=int,
+        default=1,
+        help="number of commits to fetch, defaults to 1",
+    )
+    parser.add_argument(
+        "--recursive",
+        "-r",
+        type=int,
         default=-1,
         help="maximum search depth in the `root` folder, -1 means unlimited.",
     )
@@ -55,7 +62,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def gc_single(root: Path, user_input: bool):
+def gc_single(root: Path, depth: int, user_input: bool):
     remotes = get_remote_tag(root)
     if user_input:
         print(f"[{root.stem}] Select a remote tag to fetch")
@@ -64,6 +71,7 @@ def gc_single(root: Path, user_input: bool):
             choices=set(map(str, range(len(remotes)))) | set(remotes),
             defaults="0",
         )
+        assert name_or_idx is not None
         if name_or_idx.isdigit():
             idx = int(name_or_idx)
             remote = remotes[idx]
@@ -82,7 +90,7 @@ def gc_single(root: Path, user_input: bool):
         f"+{commit}:refs/remotes/{temp_br}",
         prune=True,
         no_recurse_submodules=True,
-        depth=1,
+        depth=depth,
     )
     if not succ:
         logger.error(f"[{root.stem}] Fetch {commit} failed")
@@ -97,10 +105,10 @@ def gc_single(root: Path, user_input: bool):
 
 def main():
     args = parse_args()
-    root_gen = find_git_root(args.root, max_depth=args.depth)
+    root_gen = find_git_root(args.root, max_recursive=args.recursive)
     if args.jobs == 1:
         for i in root_gen:
-            gc_single(i, not args.no_user_input)
+            gc_single(i, args.depth, not args.no_user_input)
     else:
         workers = args.jobs if args.jobs > 0 else None
         with concurrent.futures.ProcessPoolExecutor(workers) as executor:

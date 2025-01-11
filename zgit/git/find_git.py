@@ -1,5 +1,5 @@
 """
-Copyright Wenyi Tang 2023
+Copyright Wenyi Tang 2023-2025
 
 :Author: Wenyi Tang
 :Email: wenyitang@outlook.com
@@ -10,9 +10,10 @@ Find git in common install directory
 import os
 from itertools import product
 from pathlib import Path
+from typing import List, Sequence
 
 
-def _path_cat(cand1, cand2):
+def _path_cat(cand1: Sequence[Path], cand2: Sequence[Path]) -> List[Path]:
     return [i / j for i, j in product(cand1, cand2)]
 
 

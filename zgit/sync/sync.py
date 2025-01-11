@@ -1,5 +1,5 @@
 """
-Copyright Wenyi Tang 2023
+Copyright Wenyi Tang 2023-2025
 
 :Author: Wenyi Tang
 :Email: wenyitang@outlook.com
@@ -59,7 +59,7 @@ def sync():
     """Synchronie git repositories."""
 
     args = parse_args()
-    gen = find_git_root(args.root, max_depth=args.max_search_depth)
+    gen = find_git_root(args.root, max_recursive=args.max_search_depth)
     if args.archive >= 0:
         func = Compose(update, partial(archive, older_than=args.archive))
     else:
